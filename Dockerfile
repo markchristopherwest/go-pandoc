@@ -1,19 +1,51 @@
-FROM idocking/pandoc:alpine-2.1.1
+FROM golang:alpine AS builder
 
-# Install golang and Install go-pandoc
-RUN apk update \
-    && apk add --no-cache --virtual .fetch-deps go git musl-dev\
-    && go get -v github.com/gogap/go-pandoc \
-    && mkdir app \
-    && cd app \
-    && go build github.com/gogap/go-pandoc \
-    && cp -r $(go env GOPATH)/src/github.com/gogap/go-pandoc/templates . \
-    && cp $(go env GOPATH)/src/github.com/gogap/go-pandoc/app.conf . \
-    && rm -rf $(go env GOPATH) \
-    && apk del .fetch-deps
+# set go specific env vars
+ENV CGO_ENABLED=0
+ENV GO111MODULE=on
+ENV GOOS=linux
+ENV GOARCH=amd64
 
-WORKDIR /app
 
-VOLUME /app
+ARG PATH_CONFIG="/go-pandoc/config/app.conf"
 
-CMD ["./go-pandoc"]
+RUN mkdir /config
+ADD app.conf /config/app.conf
+ADD /data /data
+ADD /docs /docs
+ADD /templates /templates
+
+
+
+RUN mkdir /build
+ADD . /build/
+WORKDIR /build
+
+# download dependencies
+RUN go mod download
+
+
+# run tests
+RUN go test ./...
+
+# build single linked binary
+RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o go-pandoc 
+
+# start over using scratch image. no need for anything else anymore
+FROM alpine:latest
+
+
+RUN apk --no-cache add --no-check-certificate ca-certificates \
+  && update-ca-certificates
+
+COPY --from=builder /build/go-pandoc /go-pandoc/
+COPY app.conf /go-pandoc/config/app.conf
+COPY --from=builder /data /go-pandoc/data
+COPY --from=builder /docs /go-pandoc/docs
+COPY --from=builder /templates /go-pandoc/templates
+
+WORKDIR /go-pandoc
+
+EXPOSE 8080
+
+CMD ["./go-pandoc", "run", "--config", "$PATH_CONFIG"]

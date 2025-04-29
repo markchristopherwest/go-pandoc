@@ -2,6 +2,8 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -52,7 +54,32 @@ func init() {
 }
 
 func NewHttpFetcher(conf config.Configuration) (httpFetcher fetcher.Fetcher, err error) {
-	httpClient := &http.Client{}
+
+	// Example: Adding Let's Encrypt certificate to the trust store
+	certPool, err := x509.SystemCertPool()
+	if err != nil {
+		// Handle error
+	}
+
+	// Read the certificate file
+	caCert, err := ioutil.ReadFile("path/to/letsencrypt_authority_x3.pem")
+	if err != nil {
+		// Handle error
+	}
+
+	// Append the certificate to the cert pool
+	if ok := certPool.AppendCertsFromPEM(caCert); !ok {
+		// Handle error
+	}
+
+	// Use the certPool in your TLS configuration
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+			},
+		},
+	}
 	httpFetcher = &HttpFetcher{
 		client: httpClient,
 	}

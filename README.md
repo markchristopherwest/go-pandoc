@@ -162,20 +162,53 @@ the converter is the following json struct
 > use `pandoc --help` command to list options
 
 
-### Use curl
+### Use curl to make html
+
+```bash
+
+curl -X POST \
+  http://localhost:8080/v1/convert \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+            "fetcher": {
+                "name": "http",
+                "params": {
+								"url": "https://gist.githubusercontent.com/markchristopherwest/a802356e7a5980d2992f3d49468ed18b/raw/98aec996afe3ec7fff16256d90e7f97f2344bbfa/EXAMPLE.md"
+                }
+            },
+            "converter": {
+                "from": "markdown",
+                "to": "html",
+                "standalone": true,
+                "template": "docs.template",
+                "variable": {
+                    "CJKmainfont": "Source Han Sans SC",
+                    "mainfont": "Source Han Sans SC",
+                    "sansfont": "Source Han Sans SC",
+                    "geometry:margin": "1cm",
+                    "subject": "gsjbxx"
+                }
+            },
+            "template": "render-html"
+}' -o test.html
+
+```
+
+### Use curl to make PDF
 
 ```bash
 curl -X POST \
-  http://IP:8080/v1/convert \
+  http://localhost:8080/v1/convert \
   -H 'accept-encoding: gzip' \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -d '{
-	"fetcher": {
-		"name": "data",
-		"params": {
-			"data": "IyMjIEhlbGxvCgo+IEdvLVBhbmRvYw=="
-		}
+		"fetcher": {
+			"name": "http",
+			"params": {
+					"url": "https://gist.githubusercontent.com/markchristopherwest/a802356e7a5980d2992f3d49468ed18b/raw/98aec996afe3ec7fff16256d90e7f97f2344bbfa/EXAMPLE.md"
+			}
 	},
 	"converter":{
 		"from": "markdown",
@@ -188,11 +221,82 @@ curl -X POST \
 	    	"geometry:margin":"1cm",
 	    	"subject":"gsjbxx"
 	    },
-	    "template": "/app/data/docs.template"
+	    "template": "default_mod.latex"
 	},
 	"template": "binary"
 }' --compressed -o test.pdf
 ```
+
+### Use curl to make docx
+
+```bash
+
+curl -X POST \
+  http://localhost:8080/v1/convert \
+  -H 'accept-encoding: gzip' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+		"fetcher": {
+			"name": "http",
+			"params": {
+					"url": "https://raw.githubusercontent.com/golang/go/master/README.md"
+			}
+	},
+	"converter":{
+		"from": "markdown",
+	    "to" : "docx",
+	    "standalone": true,
+	    "variable":{
+	    	"CJKmainfont":"Source Han Sans SC",
+	    	"mainfont":"Source Han Sans SC",
+	    	"sansfont": "Source Han Sans SC",
+	    	"geometry:margin":"1cm",
+	    	"subject":"gsjbxx"
+	    },
+	    "template": "/data/docs.template"
+	},
+	"template": "default_mod.latex"
+}' --compressed -o test.docx
+
+```
+
+### Use curl to make pptx
+
+```bash
+
+
+
+curl -X POST \
+  http://localhost:8080/v1/convert \
+  -H 'accept-encoding: gzip' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+		"fetcher": {
+			"name": "http",
+			"params": {
+					"url": "https://gist.githubusercontent.com/markchristopherwest/a802356e7a5980d2992f3d49468ed18b/raw/98aec996afe3ec7fff16256d90e7f97f2344bbfa/EXAMPLE.md"
+			}
+	},
+	"converter":{
+		"from": "markdown",
+	    "to" : "pptx",
+	    "standalone": true,
+	    "variable":{
+	    	"author":"Lorem Ipsum de Color",
+	    	"mainfont":"Source Han Sans SC",
+	    	"sansfont": "Source Han Sans SC",
+	    	"geometry:margin":"1cm",
+	    	"subject":"gsjbxx"
+	    },
+	    "template": "/data/ppts.template"
+	},
+	"template": "binary"
+}' --compressed -o test.pptx
+
+```
+
 
 > if you enabled gzip, you should add arg `--compressed` to curl
 

@@ -193,7 +193,7 @@ func New(conf config.Configuration) (srv *PandocServer, err error) {
 
 	if enableHTTP {
 
-		listenAddr := serviceConf.GetString("http.address", "127.0.0.1:8080")
+		listenAddr := serviceConf.GetString("http.address", ":8080")
 
 		httpServer := &serverWrapper{
 			n:       n,
@@ -206,7 +206,7 @@ func New(conf config.Configuration) (srv *PandocServer, err error) {
 
 	if enableHTTPS {
 
-		listenAddr := serviceConf.GetString("http.address", "127.0.0.1:443")
+		listenAddr := serviceConf.GetString("http.address", ":443")
 		certFile := serviceConf.GetString("https.cert")
 		keyFile := serviceConf.GetString("https.key")
 

@@ -16,4 +16,84 @@ go-pandoc
 
 *.sh
 *.pdf
+*.html
+*.docx
+*.pptx
 *.log
+
+# Ignore OSX type things
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+**/Icon
+**/._*
+**/.DocumentRevisions-V100
+**/.fseventsd
+**/.Spotlight-V100
+**/.TemporaryItems
+**/.Trashes
+**/.VolumeIcon.icns
+**/.com.apple.timemachine.donotpresent
+**/.AppleDB
+**/.AppleDesktop
+**/Network Trash Folder
+**/Temporary Items
+**/.apdisk
+**/*.plist
+
+# Ignore Archives, in case there is sensitive data
+**/*.tar.gz
+
+# Ignore Terraform 
+**/*.tfvars
+**/.terraform
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/*.lck
+**/*.lck.info
+**/*.blob
+
+# Ignore licence files for TFE & Enterprise Keys
+**/.airgap
+**/*.lic
+**/*.rli
+**/*.hclic
+
+# Ignore certificates
+**/*.pem
+**/*.key
+**/*.crt
+**/*.csr
+**/tls
+
+# Ignore Sentinel
+**/.sentinel
+
+# Ignore Vagrant
+**/.vagrant
+**/output-*
+**/*.box
+/examples/*/boxes
+/examples/*/data
+/examples/*/gems
+/examples/*/insecure_private_keys
+/examples/*/rgloader
+/examples/*/tmp
+/examples/*/setup_version
+
+# Ignore logs
+**/*.log
+
+# Ignore Modules that are Not Ready Yet
+/modules/terraform-azure*
+/modules/terraform-gcloud*
+
+# Ignore other build folders
+/test/*
+<unknown>
+/builds/**
+
+# Ignore other tls folders
+/tls/*
+/tls/**

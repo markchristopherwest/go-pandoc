@@ -1,9 +1,22 @@
-server:
-    image: idocking/go-pandoc:latest
-    command: ["./go-pandoc", "run"]
+services:
+  backend:
+    environment:
+      PATH_CONFIG: "/config/app.conf"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PATH_CONFIG: "/config/app.conf"
+    command: ["./go-pandoc", "run", "--config", "/go-pandoc/config/app.conf"]
     ports:
-      - 8080:8080
+      - "8080:8080"
     volumes:
-      - ./templates:/app/templates
-      - ./data:/app/data
-      - ./app.conf:/app/app.conf
+      - "${PWD}/templates:/app/templates"
+      - "${PWD}/data:/app/data"
+      - "${PWD}/app.conf:/app/config/app.conf"
+  
+  app:
+    image: alpine/curl
+    depends_on:
+      - backend
+    command: ["sh", "-c", "sleep 5 && curl backend:8080/v1/ping"]
